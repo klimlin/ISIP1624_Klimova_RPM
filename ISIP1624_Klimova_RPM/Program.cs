@@ -56,6 +56,28 @@ void coutData()
     }
 }
 
+void statistica()
+{
+    int max = money[0];
+    int min = money[0];
+    int average = 0;
+    int sum = 0;
+
+    for(int i = 0; i < amountOfOperations; i++)
+    {
+        sum += money[i];
+        if(max < money[i]) max = money[i];
+        if(min > money[i]) min = money[i];
+    }
+    average = sum / amountOfOperations;
+
+    Console.WriteLine("Статистика");
+    Console.WriteLine("Минимальное значение: " + min);
+    Console.WriteLine("Максимальное значение: " + max);
+    Console.WriteLine("Сумма: " + sum);
+    Console.WriteLine("Среднее значение: " + average);
+}
+
 int v = 0;
 bool result = false;
 bool flag = true;
@@ -76,7 +98,7 @@ while (flag)
     {
         case 0: flag = false; break;
         case 1: coutData(); break;
-        case 2: ; break;
+        case 2: statistica(); break;
         case 3: ; break;
         case 4: ; break;
         case 5: ; break;

@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
@@ -32,6 +33,7 @@ while (condition)
         case 2: stats(); break;
         case 3: saveTextStats(); break;
         case 4: printStatsPreviosTexts(); break;
+        case 5: printAllStatsOfAllTexts(); break;
             default: Console.WriteLine("Некорректный ввод. Введите число."); break;
     }
 
@@ -43,7 +45,8 @@ void printMainMenu()
     Console.WriteLine("1. Ввести текст для подсчет статистики");
     Console.WriteLine("2. Посчитать статистику по последнему введенному тексту");
     Console.WriteLine("3. Сохранить статистику по последнему введенному тексту");
-    Console.WriteLine("4. Вывести статистику по последнему сохраненному тексту в стэке"); 
+    Console.WriteLine("4. Вывести статистику по последнему сохраненному тексту в стэке");
+    Console.WriteLine("5. Вывести статистику по ВСЕМ сохраненным текстам в стэке");
     Console.WriteLine("0. Закончить работу");
 }
 
@@ -102,6 +105,28 @@ void printStatsPreviosTexts()
     foreach (var item in alltexts.Peek().lettersN)
     {
         Console.WriteLine($"{item.Key}: {item.Value}");
+    }
+}
+
+void printAllStatsOfAllTexts()
+{
+    foreach (TextStatsNumbers itemS in alltexts)
+    {
+        {
+            Console.WriteLine("Статистика по всему введенному тексту");
+            Console.WriteLine($"Текст: {itemS.text}");
+            Console.WriteLine($"Кол-во слов в веденном тексте: {itemS.wordsN}");
+            Console.WriteLine($"Кол-во предложений в веденном тексте: {itemS.sentencesN}");
+            Console.WriteLine($"Количество гласных букв: {itemS.vowelsN}");
+            Console.WriteLine($"Количество согласных букв: {itemS.consonantN}");
+            Console.WriteLine($"Самое короткое слово: {itemS.shortestWord}");
+            Console.WriteLine($"Самое длинное слово: {itemS.longestWord}");
+            Console.WriteLine("Статистика по частоте встречаемости букв:");
+            foreach (var item in itemS.lettersN)
+            {
+                Console.WriteLine($"{item.Key}: {item.Value}");
+            }
+        }
     }
 }
 

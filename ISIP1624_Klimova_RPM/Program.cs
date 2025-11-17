@@ -78,6 +78,69 @@ university.printStudents();
 university.printTeachers();
 university.printStudentsCourses();
 
+bool cond = true;
+
+while (cond)
+{
+    printMainMenu();
+
+    int var = 0;
+    bool result = false;
+    while (!result)
+    {
+        Console.WriteLine("Введите число выбранного пункта");
+        result = int.TryParse(Console.ReadLine(), out var);
+    }
+
+    switch (var)
+    {
+        case 0: cond = false; break;
+        case 1:
+            university.printCourses();
+            university.printStudents();
+            university.printTeachers();
+            university.printStudentsCourses();
+            break;
+        case 2: university.printStudents(); break;
+        case 3: university.printTeachers(); break;
+        case 4: university.printCourses(); break;
+        case 5: university.printStudentsCourses(); break;
+
+        case 6: ; break;
+        case 7: ; break;
+        case 8: ; break;
+
+        case 9: ; break;
+        case 10:; break;
+        case 11:; break;
+
+        default: Console.WriteLine("Некорректный ввод. Введите число."); break;
+    }
+}
+
+void printMainMenu()
+{
+    Console.WriteLine("УПРАВЛЕНИЕ УЧЕБНЫМ ПРОЦЕССОМ В УНИВЕРСИТЕТЕ");
+    Console.WriteLine();
+    Console.WriteLine("1. ВЫВЕСТИ всю информацию об университете");
+    Console.WriteLine("2. ВЫВЕСТИ список студентов");
+    Console.WriteLine("3. ВЫВЕСТИ список преподавателей");
+    Console.WriteLine("4. ВЫВЕСТИ список курсов");
+    Console.WriteLine("5. ВЫВЕСТИ список студентов и их курсов");
+    Console.WriteLine();
+    Console.WriteLine("6. ДОБАВИТЬ нового студента");
+    Console.WriteLine("7. ПОСМОТРЕТЬ информацию о конкретном студента (поиск по фамилии)");
+    Console.WriteLine("8. ЗАПИСАТЬ студента на курс");
+    Console.WriteLine();
+    Console.WriteLine("6. ДОБАВИТЬ нового преподавателя");
+    Console.WriteLine("7. ПОСМОТРЕТЬ информацию о конкретном преподавателе (поиск по фамилии)");
+    Console.WriteLine("8. НАЗНАЧИТЬ преподавателя на курс");
+    Console.WriteLine();
+    Console.WriteLine("9. ДОБАВИТЬ новый курс");
+    Console.WriteLine("10. ПОСМОТРЕТЬ информацию о курсе");
+    Console.WriteLine("11. ВЫВЕСТИ всех студентов, записанных на курс");
+    Console.WriteLine("0. ");
+}
 class Person
 {
     private string _name;

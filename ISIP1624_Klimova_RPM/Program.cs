@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Xml.Linq;
 
-
+// переделать с абстрактным классом или интерфейсом
 University university = new University();
 
 Student Ivanov = new Student("Иван", "Иванов", 18);
@@ -106,13 +106,17 @@ while (cond)
         case 4: university.printCourses(); break;
         case 5: university.printStudentsCourses(); break;
 
-        case 6: ; break;
+        case 6: university.addNewStudentYourself(); break;
         case 7: ; break;
         case 8: ; break;
 
-        case 9: ; break;
+        case 9: university.addNewTeacherYourself(); break;
         case 10:; break;
         case 11:; break;
+
+            case 12:; break;
+            case 13:; break;
+            case 14:; break;
 
         default: Console.WriteLine("Некорректный ввод. Введите число."); break;
     }
@@ -132,14 +136,14 @@ void printMainMenu()
     Console.WriteLine("7. ПОСМОТРЕТЬ информацию о конкретном студента (поиск по фамилии)");
     Console.WriteLine("8. ЗАПИСАТЬ студента на курс");
     Console.WriteLine();
-    Console.WriteLine("6. ДОБАВИТЬ нового преподавателя");
-    Console.WriteLine("7. ПОСМОТРЕТЬ информацию о конкретном преподавателе (поиск по фамилии)");
-    Console.WriteLine("8. НАЗНАЧИТЬ преподавателя на курс");
+    Console.WriteLine("9. ДОБАВИТЬ нового преподавателя");
+    Console.WriteLine("10. ПОСМОТРЕТЬ информацию о конкретном преподавателе (поиск по фамилии)");
+    Console.WriteLine("11. НАЗНАЧИТЬ преподавателя на курс");
     Console.WriteLine();
-    Console.WriteLine("9. ДОБАВИТЬ новый курс");
-    Console.WriteLine("10. ПОСМОТРЕТЬ информацию о курсе");
-    Console.WriteLine("11. ВЫВЕСТИ всех студентов, записанных на курс");
-    Console.WriteLine("0. ");
+    Console.WriteLine("12. ДОБАВИТЬ новый курс");
+    Console.WriteLine("13. ПОСМОТРЕТЬ информацию о курсе");
+    Console.WriteLine("14. ВЫВЕСТИ всех студентов, записанных на курс");
+    Console.WriteLine("0. Закончить работу");
 }
 class Person
 {
@@ -159,6 +163,17 @@ class Person
     {
         return ($"{_surname} {_name}");
     }
+
+    public string getName()
+    {
+        return _name;
+    }
+
+    public string getSurname()
+    {
+        return _surname;
+    }
+
 }
 
 class Student : Person
@@ -278,6 +293,78 @@ class University
     public void addCourse(Course course){ _courses.Add(course);}
 
     public void addTeacher(Teacher teacher){ _teachers.Add(teacher);}
+
+    private Person addNewPerson()
+    {
+        Person newPer = null;
+
+        bool flag = false;
+
+        while (!flag)
+        {
+            Console.WriteLine("Напишите фамилию");
+
+            string surname = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(surname))
+            {
+                Console.WriteLine("Попробуйте ещё раз");
+                break;
+            }
+
+            Console.WriteLine("Напишите имя");
+
+            string name = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                Console.WriteLine("Попробуйте ещё раз");
+                break;
+            }
+
+            bool resA = false;
+            int age = 0;
+
+            while (!resA)
+            {
+                Console.WriteLine("Напишите возраст");
+                resA = int.TryParse(Console.ReadLine(), out age);
+
+                if (!resA)
+                {
+                    Console.WriteLine("Неверный возраст. Попробуйте ещё раз");
+                    resA = false;
+                }
+                else if (age < 0 || age > 100)
+                {
+                    Console.WriteLine("Неверный возраст. Попробуйте ещё раз");
+                    resA = false;
+                }
+
+            }
+
+            newPer = new Person(name,surname, age);
+            flag = true;
+
+        }
+
+        return newPer;
+    }
+    public void addNewStudentYourself()
+    {
+        Console.WriteLine("НОВЫЙ СТУДЕНТ");
+        Person newStud = addNewPerson();
+        Student stud = new Student(newStud.getName(), newStud.getSurname(), newStud.Age);
+        addStudent(stud);
+    }
+
+    public void addNewTeacherYourself()
+    {
+        Console.WriteLine("НОВЫЙ ПРЕПОДАВАТЕЛЬ");
+        Person newTeach = addNewPerson();
+        Teacher teach = new Teacher(newTeach.getName(), newTeach.getSurname(), newTeach.Age);
+        addTeacher(teach);
+    }
 
     public void deleteStudent()
     {

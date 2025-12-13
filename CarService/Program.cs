@@ -10,6 +10,11 @@ namespace CarService
     {
         static void Main(string[] args)
         {
+            List<CarParts> carParts = Core.Context.CarParts.ToList();
+            foreach (CarParts carPart in carParts)
+            {
+                Console.WriteLine(carPart.Name);
+            }
         }
     }
 

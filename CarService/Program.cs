@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,12 +14,14 @@ namespace CarService
         static List<CarServices> carServices = Core.Context.CarServices.ToList();
         static List<CarServicesCarParts> carServicesCarParts = Core.Context.CarServicesCarParts.ToList();
 
+        int carsShoppingCounter = 0;
+
         static void Main(string[] args)
         {
 
             bool gaming = true;
 
-            while (true)
+            while (gaming)
             {
                 int choice = mainMenu();
 
@@ -85,6 +88,28 @@ namespace CarService
             return choice;
         }
 
+        static int orderDeatailChoice()
+        {
+            Console.WriteLine("Заказываем деталь? 1 - да, 2 - нет");
+
+            int choice = 0;
+            bool result = false;
+            while (!result)
+            {
+                Console.WriteLine("Введите число выбранного пункта");
+                result = int.TryParse(Console.ReadLine(), out choice);
+
+                if (choice != 1 && choice != 2)
+                {
+                    result = false;
+                    Console.WriteLine("НЕКОРРЕКТНЫЙ ВВОД");
+                }
+
+            }
+
+            return choice;
+        }
+
         static void availableParts()
         {
             foreach (CarParts carPart in carParts)
@@ -109,10 +134,16 @@ namespace CarService
             double finalPrice = (double)carParts[index].Price + (double)carParts[index].Price * 0.10;
             Console.WriteLine($"Стоимость ремонта: {finalPrice}\n");
 
-            Console.WriteLine("ВЫВЕСТИ ВСЕ ДЕТАЛИ ДОДЕЛАТЬ ПОТОМ");
+            Console.WriteLine("ДЕТАЛИ, ИМЕЮЩИЕСЯ НА СКЛАДЕ:");
+            availableParts();
+
             //ДОЗАКАЗАТЬ ДЕТАЛЬ
 
-            Console.WriteLine("Хотите дозаказать деталь?");
+            if (orderDeatailChoice() == 1)
+            {
+                shopping();
+            }
+
 
             int choice = repairMenu();
 
@@ -128,37 +159,104 @@ namespace CarService
                         {
                             if(carParts[index].ID == item.ID)
                             {
-                                item.QuantityOfPart -= 1;
+                                item.QuantityOfPart -= 1; //убрали деталь
                             }
                         }
                         carServices[0].AmountOfMoney += (int)finalPrice;
                         Console.WriteLine("Машина отремонтирована");
                         Console.WriteLine($"Ваш баланс - {carServices[0].AmountOfMoney}");
+                    } else if (foundPart.QuantityOfPart == 0)
+                    {
+                        Console.WriteLine("На складе нет детали!!! Меняем случайную деталь!!!");
+
+
+                        bool findingDetailInStock = false;
+
+                        while(!findingDetailInStock)
+                        {
+                            int indexRandomRepair = random.Next(carParts.Count);
+                            CarServicesCarParts randomPart = carServicesCarParts.FirstOrDefault(part => part.CarPartID == carParts[indexRandomRepair].ID);
+
+                            if (randomPart.QuantityOfPart > 0)
+                            {
+                                findingDetailInStock = true;
+
+                                foreach (var item in carServicesCarParts)
+                                {
+                                    if (carParts[indexRandomRepair].ID == item.ID)
+                                    {
+                                        item.QuantityOfPart -= 1; //убрали деталь
+                                    }
+                                }
+                                carServices[0].AmountOfMoney += (int)finalPrice;
+                                Console.WriteLine("Машина отремонтирована рандомной деталью");
+                                Console.WriteLine($"Ваш баланс - {carServices[0].AmountOfMoney}");
+
+                                carServices[0].AmountOfMoney -= 2000; //штраф
+                                Console.WriteLine("Клиент недоволен!!! Вас отштрафовали!!!");
+                                Console.WriteLine($"Ваш баланс - {carServices[0].AmountOfMoney}");
+
+                            }
+
+                        }
+
                     }
                     break;
                 case 2:
-                    Console.WriteLine("Нужная деталь отсутствует на складе. Мы вынуждены отказать в обслуживании");
+                    Console.WriteLine("Нужная деталь отсутствует на складе. Мы вынуждены отказать в обслуживании :(");
                     carServices[0].AmountOfMoney -= 500; //штраф
-                    Console.WriteLine("Вас отштрафовали!!!");
+                    Console.WriteLine("Вас оштрафовали за отказ в обслуживании!!!");
                     Console.WriteLine($"Ваш баланс - {carServices[0].AmountOfMoney}");
                     break;
                     
             }
             
-            // Вы смотрите на свой склад и решаете - есть ли у вас нужная запчасть.
-            // Если есть, вы меняете её и получаете деньги от клиента.
-            // Если нет - можете отказать клиенту, но тогда придётся заплатить штраф за отказ в обслуживании. 
-
-            // Будьте внимательны! Если вы примите заказ, но нужной детали на складе не будет,
-            // то будет произведена замена другой случайной детали, которая есть на складе,
-            // и тогда клиент вернётся очень недовольным и
-            // вы будете обязаны возместить ему ущерб - это выйдет дороже чем просто отказать.
-
 
         }
 
         static void shopping()
         {
+            Console.WriteLine("ДОСТУПНЫЕ ДЛЯ ЗАКАЗА ДЕТАЛИ:");
+            foreach (CarParts carPart in carParts)
+            {
+                    Console.WriteLine($"ID: {carPart.ID} NAME: {carPart.Name}");
+            }
+
+            int choice = 0;
+            bool result = false;
+            while (!result)
+            {
+                Console.WriteLine("Напишите ID детали, которую хотите заказать:");
+                result = int.TryParse(Console.ReadLine(), out choice);
+
+                if (choice == 4 || choice <= 0 || choice > 12)
+                {
+                    result = false;
+                    Console.WriteLine("НЕКОРРЕКТНЫЙ ВВОД");
+                }
+            }
+
+            // проверка на наличие нужной суммы денег
+
+            foreach (CarParts carPart in carParts)
+            {
+                if(carPart.ID==choice)
+                {
+                    if (carServices[0].AmountOfMoney >= carPart.Price)
+                    {
+                        // заказываем
+                        carServices[0].AmountOfMoney -= carPart.Price;
+                        Console.WriteLine("Оплата прошла. Деталь будет доставлена через 2 машины.");
+                        // прописать доставку детали
+                    }
+                    else
+                    {
+                        Console.WriteLine("Недостаточно средств на балансе!!!");
+                    }
+                }
+            }
+
+
             // какие детали доступны и сколько они стоят, и купить нужное количество.
             // Деньги за покупку сразу списываются с вашего баланса,
             // но детали появляются не сразу, а только спустя 2 машины (не важно, обслужена машина или нет).

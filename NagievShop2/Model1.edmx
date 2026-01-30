@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="Хранилище NagievShopModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="Хранилище NagievShopModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Cart">
           <Key>
             <PropertyRef Name="ID" />
@@ -198,7 +198,8 @@
             <End Role="Order" EntitySet="Order" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="NagievShopModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -212,6 +213,18 @@
           <NavigationProperty Name="User" Relationship="Self.FK_Cart_User" FromRole="Cart" ToRole="User" />
           <NavigationProperty Name="CartItem" Relationship="Self.FK_CartItem_Cart" FromRole="Cart" ToRole="CartItem" />
         </EntityType>
+        <EntityType Name="CartItem">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CartID" Type="Int32" Nullable="false" />
+          <Property Name="ItemID" Type="Int32" Nullable="false" />
+          <Property Name="Quantity" Type="Int32" Nullable="false" />
+          <Property Name="Purchase" Type="Decimal" Precision="19" Scale="4" Nullable="false" />
+          <NavigationProperty Name="Cart" Relationship="Self.FK_CartItem_Cart" FromRole="CartItem" ToRole="Cart" />
+          <NavigationProperty Name="Item" Relationship="Self.FK_CartItem_Item" FromRole="CartItem" ToRole="Item" />
+        </EntityType>
         <EntityType Name="Item">
           <Key>
             <PropertyRef Name="ID" />
@@ -221,6 +234,18 @@
           <Property Name="Price" Type="Decimal" Precision="19" Scale="4" Nullable="false" />
           <NavigationProperty Name="CartItem" Relationship="Self.FK_CartItem_Item" FromRole="Item" ToRole="CartItem" />
           <NavigationProperty Name="ItemOrder" Relationship="Self.FK_ItemOrder_Item" FromRole="Item" ToRole="ItemOrder" />
+        </EntityType>
+        <EntityType Name="ItemOrder">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ItemID" Type="Int32" Nullable="false" />
+          <Property Name="OrderID" Type="Int32" Nullable="false" />
+          <Property Name="Quantity" Type="Int32" Nullable="false" />
+          <Property Name="Purchase" Type="Decimal" Precision="19" Scale="4" Nullable="false" />
+          <NavigationProperty Name="Item" Relationship="Self.FK_ItemOrder_Item" FromRole="ItemOrder" ToRole="Item" />
+          <NavigationProperty Name="Order" Relationship="Self.FK_ItemOrder_Order" FromRole="ItemOrder" ToRole="Order" />
         </EntityType>
         <EntityType Name="Order">
           <Key>
@@ -262,38 +287,6 @@
           <Property Name="Password" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Cart" Relationship="Self.FK_Cart_User" FromRole="User" ToRole="Cart" />
           <NavigationProperty Name="Order" Relationship="Self.FK_Order_User" FromRole="User" ToRole="Order" />
-        </EntityType>
-        <EntityType Name="CartItem">
-          <Key>
-            <PropertyRef Name="ID" />
-            <PropertyRef Name="CartID" />
-            <PropertyRef Name="ItemID" />
-            <PropertyRef Name="Quantity" />
-            <PropertyRef Name="Purchase" />
-          </Key>
-          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CartID" Type="Int32" Nullable="false" />
-          <Property Name="ItemID" Type="Int32" Nullable="false" />
-          <Property Name="Quantity" Type="Int32" Nullable="false" />
-          <Property Name="Purchase" Type="Decimal" Precision="19" Scale="4" Nullable="false" />
-          <NavigationProperty Name="Cart" Relationship="Self.FK_CartItem_Cart" FromRole="CartItem" ToRole="Cart" />
-          <NavigationProperty Name="Item" Relationship="Self.FK_CartItem_Item" FromRole="CartItem" ToRole="Item" />
-        </EntityType>
-        <EntityType Name="ItemOrder">
-          <Key>
-            <PropertyRef Name="ID" />
-            <PropertyRef Name="ItemID" />
-            <PropertyRef Name="OrderID" />
-            <PropertyRef Name="Quantity" />
-            <PropertyRef Name="Purchase" />
-          </Key>
-          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ItemID" Type="Int32" Nullable="false" />
-          <Property Name="OrderID" Type="Int32" Nullable="false" />
-          <Property Name="Quantity" Type="Int32" Nullable="false" />
-          <Property Name="Purchase" Type="Decimal" Precision="19" Scale="4" Nullable="false" />
-          <NavigationProperty Name="Item" Relationship="Self.FK_ItemOrder_Item" FromRole="ItemOrder" ToRole="Item" />
-          <NavigationProperty Name="Order" Relationship="Self.FK_ItemOrder_Order" FromRole="ItemOrder" ToRole="Order" />
         </EntityType>
         <Association Name="FK_Cart_User">
           <End Role="User" Type="Self.User" Multiplicity="1" />
@@ -381,13 +374,13 @@
         </Association>
         <EntityContainer Name="NagievShopEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Cart" EntityType="Self.Cart" />
+          <EntitySet Name="CartItem" EntityType="Self.CartItem" />
           <EntitySet Name="Item" EntityType="Self.Item" />
+          <EntitySet Name="ItemOrder" EntityType="Self.ItemOrder" />
           <EntitySet Name="Order" EntityType="Self.Order" />
           <EntitySet Name="PickUpPoint" EntityType="Self.PickUpPoint" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
           <EntitySet Name="User" EntityType="Self.User" />
-          <EntitySet Name="CartItem" EntityType="Self.CartItem" />
-          <EntitySet Name="ItemOrder" EntityType="Self.ItemOrder" />
           <AssociationSet Name="FK_Cart_User" Association="Self.FK_Cart_User">
             <End Role="User" EntitySet="User" />
             <End Role="Cart" EntitySet="Cart" />
@@ -432,12 +425,34 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="CartItem">
+            <EntityTypeMapping TypeName="NagievShopModel.CartItem">
+              <MappingFragment StoreEntitySet="CartItem">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="CartID" ColumnName="CartID" />
+                <ScalarProperty Name="ItemID" ColumnName="ItemID" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="Purchase" ColumnName="Purchase" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Item">
             <EntityTypeMapping TypeName="NagievShopModel.Item">
               <MappingFragment StoreEntitySet="Item">
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Price" ColumnName="Price" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ItemOrder">
+            <EntityTypeMapping TypeName="NagievShopModel.ItemOrder">
+              <MappingFragment StoreEntitySet="ItemOrder">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="ItemID" ColumnName="ItemID" />
+                <ScalarProperty Name="OrderID" ColumnName="OrderID" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="Purchase" ColumnName="Purchase" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -477,28 +492,6 @@
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="CartItem">
-            <EntityTypeMapping TypeName="NagievShopModel.CartItem">
-              <MappingFragment StoreEntitySet="CartItem">
-                <ScalarProperty Name="ID" ColumnName="ID" />
-                <ScalarProperty Name="CartID" ColumnName="CartID" />
-                <ScalarProperty Name="ItemID" ColumnName="ItemID" />
-                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
-                <ScalarProperty Name="Purchase" ColumnName="Purchase" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ItemOrder">
-            <EntityTypeMapping TypeName="NagievShopModel.ItemOrder">
-              <MappingFragment StoreEntitySet="ItemOrder">
-                <ScalarProperty Name="ID" ColumnName="ID" />
-                <ScalarProperty Name="ItemID" ColumnName="ItemID" />
-                <ScalarProperty Name="OrderID" ColumnName="OrderID" />
-                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
-                <ScalarProperty Name="Purchase" ColumnName="Purchase" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -1,10 +1,12 @@
-﻿using System;
+﻿
+using NagievShop2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NagievShop
+namespace NagievShop2
 {
     internal class Program
     {
@@ -15,10 +17,10 @@ namespace NagievShop
         static List<ItemOrder> itemOrders = Core.Context.ItemOrder.ToList();
         static List<PickUpPoint> pickUpPoints = Core.Context.PickUpPoint.ToList();
         static List<User> users = Core.Context.User.ToList();
-        
 
-        // пароль только цифры
-        // Регистрация с подтверждением пароля (пароль 6 символов)
+
+        // пароль только цифры (как поменять формат, если меняю формат в БД?) вылетали ошибки
+        // формат даты - сохраняет только дату саму, без времени
 
 
         static void Main(string[] args)
@@ -111,7 +113,7 @@ namespace NagievShop
             if (int.TryParse(input, out adressId))
             {
                 // Ищем по ID
-   
+
                 if (pickUpPoints.FirstOrDefault(p => p.ID == adressId) == null)
                 {
                     Console.WriteLine("Пункт с таким ID не найден.");
@@ -135,7 +137,7 @@ namespace NagievShop
             orders.Add(newOrder); // сохраняем коллекцию
             Core.Context.Order.Add(newOrder);
             Core.Context.SaveChanges();
-
+            decimal finalPurchase = 0;
             // создаем записи для каждого товара в заказе
             foreach (var cartItem in itemsInCart)
             {
@@ -146,6 +148,8 @@ namespace NagievShop
                     Quantity = cartItem.Quantity,
                     Purchase = cartItem.Purchase / cartItem.Quantity
                 };
+
+                finalPurchase += cartItem.Purchase;
                 itemOrders.Add(itemOrder); // сохраняем в коллекцию
                 Core.Context.ItemOrder.Add(itemOrder);
             }
@@ -154,7 +158,7 @@ namespace NagievShop
             Core.Context.SaveChanges();
 
             // ОЧИЩАЕМ корзину
-            
+
             foreach (var cartItem in itemsInCart)
             {
                 cartItems.Remove(cartItem);
@@ -163,6 +167,9 @@ namespace NagievShop
             Core.Context.SaveChanges();
 
             Console.WriteLine("Ваш заказ успешно оформлен и корзина очищена.");
+            Console.WriteLine(new string('-', 40));
+            Console.WriteLine($"ИТОГОВАЯ СТОИМОСТЬ: {finalPurchase}");
+            Console.WriteLine(new string('-', 40));
         }
 
         static void ShowUserOrders(User user)
@@ -189,7 +196,7 @@ namespace NagievShop
                 Console.WriteLine($"Общая сумма: {order.Purchase:F2} руб.");
 
                 // Получаем связанные товары
-                var itemsInOrder = itemOrders.Where( u=> u.OrderID == order.ID).ToList();
+                var itemsInOrder = itemOrders.Where(u => u.OrderID == order.ID).ToList();
 
                 Console.WriteLine("Товары в заказе: ");
 
@@ -279,13 +286,17 @@ namespace NagievShop
             {
                 OrderID = newOrder.ID,
                 ItemID = itemToOrder.ID,
-                Quantity = 1,
+                Quantity = quantity,
                 Purchase = quantity * itemToOrder.Price
             };
+            itemOrders.Add(itemOrder);
             Core.Context.ItemOrder.Add(itemOrder);
             Core.Context.SaveChanges();
 
             Console.WriteLine($"Заказ на товар '{itemToOrder.Name}' оформлен успешно!");
+            Console.WriteLine(new string('-', 40));
+            Console.WriteLine($"ИТОГОВАЯ СТОИМОСТЬ: {itemOrder.Purchase}");
+            Console.WriteLine(new string('-', 40));
         }
 
         static void AddItemToCart(User user)
@@ -332,7 +343,7 @@ namespace NagievShop
                 // сохраняем
                 carts.Add(userCart);
                 Core.Context.Cart.Add(userCart);
-                Core.Context.SaveChanges(); 
+                Core.Context.SaveChanges();
             }
 
             // находим товар по ItemID
@@ -383,16 +394,31 @@ namespace NagievShop
 
             if (userCart != null)
             {
-                Console.WriteLine("ТОВАРЫ В ВАШЕЙ КОРЗИНЕ");
                 var itemsInCart = cartItems.Where(u => u.CartID == userCart.ID).ToList();
+                Console.WriteLine("ТОВАРЫ В ВАШЕЙ КОРЗИНЕ");
 
-                foreach (var itemInCart in itemsInCart)
+                decimal finalPurchase = 0;
+
+                if(itemsInCart.Count() != 0)
                 {
-                    
-                    Item targetItem = items.FirstOrDefault(item => item.ID == itemInCart.ItemID);
-                    Console.Write($"Товар: {targetItem.Name} ");
-                    Console.WriteLine($"Количество: {itemInCart.Quantity}, Стоимость: {itemInCart.Purchase}");
+                    foreach (var itemInCart in itemsInCart)
+                    {
+                        finalPurchase += itemInCart.Purchase;
+                        Item targetItem = items.FirstOrDefault(item => item.ID == itemInCart.ItemID);
+                        Console.Write($"Товар: {targetItem.Name} ");
+                        Console.WriteLine($"Количество: {itemInCart.Quantity}, Стоимость: {itemInCart.Purchase}");
+                    }
+
+                    Console.WriteLine(new string('-', 40));
+                    Console.WriteLine($"ИТОГОВАЯ СТОИМОСТЬ: {finalPurchase}");
+                    Console.WriteLine(new string('-', 40));
+
+                } else
+                {
+                    Console.WriteLine("В вашей корзине нет товаров.");
                 }
+
+
 
             }
             else

@@ -58,10 +58,11 @@ namespace NagievShop2
                 Console.WriteLine("1. Просмотр товаров");
                 Console.WriteLine("2. Добавить товар в корзину");
                 Console.WriteLine("3. Просмотр корзины");
-                Console.WriteLine("4. Заказать 1 товар");
-                Console.WriteLine("5. Заказать все товары в корзине и очистить корзину");
-                Console.WriteLine("6. Мои заказы");
-                Console.WriteLine("7. Выход");
+                Console.WriteLine("4. Заказать 1 товар из списка товаров");
+                Console.WriteLine("5. Заказать 1 товар из корзины");
+                Console.WriteLine("6. Заказать все товары в корзине и очистить корзину");
+                Console.WriteLine("7. Мои заказы");
+                Console.WriteLine("8. Выход");
 
                 string choice = Console.ReadLine();
                 switch (choice)
@@ -70,15 +71,168 @@ namespace NagievShop2
                     case "2": AddItemToCart(user); break;
                     case "3": ShowCart(user); break;
                     case "4": OrderSingleItem(user); break;
-                    case "5": OrderAllItemsInCart(user); break;
-                    case "6": ShowUserOrders(user); break;
-                    case "7": exit = true; break;
+                    case "5": OrderOneItemFromCart(user); break;
+                    case "6": OrderAllItemsInCart(user); break;
+                    case "7": ShowUserOrders(user); break;
+                    case "8": exit = true; break;
                     default: Console.WriteLine("Некорректный ввод. Попробуйте снова."); break;
                 }
             }
         }
 
-        // ОСТАЛАСЬ ПЯТАЯ ФУНКЦИЯ!!!
+
+
+        static void OrderOneItemFromCart(User user)
+        {
+
+            var userCart = carts.FirstOrDefault(c => c.UserID == user.ID);
+            if (userCart == null)
+            {
+                Console.WriteLine("У вас нет товаров в корзине.");
+                return;
+            }
+
+            // все товары в корзине
+            var itemsInCart = cartItems.Where(u => u.CartID == userCart.ID).ToList();
+
+            if (itemsInCart.Count == 0)
+            {
+                Console.WriteLine("Ваша корзина пуста.");
+                return;
+            }
+
+            Console.WriteLine("Товары в корзине:");
+            foreach (var itemInCart in itemsInCart)
+            {
+                var item = items.FirstOrDefault(i => i.ID == itemInCart.ItemID);
+                if (item != null)
+                {
+                    Console.WriteLine($"ID: {item.ID} | Название: {item.Name} | Количество: {itemInCart.Quantity} | Цена за единицу: {item.Price:F2} руб.");
+                }
+            }
+
+            Console.WriteLine("Введите ID товара для покупки:");
+            string itemIdInput = Console.ReadLine();
+            if (!int.TryParse(itemIdInput, out int targetitemId))
+            {
+                Console.WriteLine("Некорректный ID товара.");
+                return;
+            }
+
+            // находим товар в корзине
+            var cartItem = itemsInCart.FirstOrDefault(u => u.ItemID == targetitemId);
+            if (cartItem == null)
+            {
+                Console.WriteLine("Этот товар отсутствует в вашей корзине.");
+                return;
+            }
+
+            // находит товар в общей коллекции и фиксируем (фиксируем цену за 1 товар)
+            var itemToBuy = items.FirstOrDefault(i => i.ID == targetitemId);
+            if (itemToBuy == null)
+            {
+                Console.WriteLine("Товар не найден в базе.");
+                return;
+            }
+
+            // запрос количества
+            Console.WriteLine($"Введите количество товара для покупки (доступно в корзине: {cartItem.Quantity}):");
+            string quantityInput = Console.ReadLine();
+            if (!int.TryParse(quantityInput, out int quantity) || quantity <= 0)
+            {
+                Console.WriteLine("Некорректное количество.");
+                return;
+            }
+
+            if (quantity > cartItem.Quantity)
+            {
+                Console.WriteLine("Запрошенное количество превышает доступное в корзине.");
+                return;
+            }
+
+            // оформление заказа
+            decimal purchaseSum = quantity * itemToBuy.Price;
+
+            // pickuppointID
+            int adressId = 0;
+
+            Console.WriteLine("Доступные пункты выдачи:");
+            foreach (var point in pickUpPoints)
+            {
+                Console.WriteLine($"ID: {point.ID} Адрес: {point.Adress}");
+            }
+
+            Console.WriteLine("Введите ID пункта выдачи:");
+            string input = Console.ReadLine();
+
+            if (int.TryParse(input, out adressId))
+            {
+                // Ищем по ID
+
+                if (pickUpPoints.FirstOrDefault(p => p.ID == adressId) == null)
+                {
+                    Console.WriteLine("Пункт с таким ID не найден.");
+                    return;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Некорректный ввод ID.");
+                return;
+            }
+
+            // Создаем заказ
+            Order newOrder = new Order
+            {
+                UserID = user.ID,
+                Date = DateTime.Now,
+                PickUpPointID = adressId,
+                Purchase = purchaseSum
+            };
+            orders.Add(newOrder);
+            Core.Context.Order.Add(newOrder);
+            Core.Context.SaveChanges();
+
+            // создаем запись для товара в таблице ItemOrder
+            ItemOrder itemOrder = new ItemOrder
+            {
+                OrderID = newOrder.ID,
+                ItemID = itemToBuy.ID,
+                Quantity = quantity,
+                Purchase = itemToBuy.Price
+            };
+            itemOrders.Add(itemOrder);
+            Core.Context.ItemOrder.Add(itemOrder);
+            Core.Context.SaveChanges();
+
+            Console.WriteLine(new string('-', 40));
+            Console.WriteLine($"Общая стоимость покупки: {purchaseSum:F2} руб.");
+            Console.WriteLine(new string('-', 40));
+
+            // обновляем количество товара в корзине
+            if (quantity == cartItem.Quantity)
+            {
+                // удаляем товар из корзины
+                cartItems.Remove(cartItem);
+                Core.Context.CartItem.Remove(cartItem);
+            }
+            else
+            {
+                // уменьшаем количество!!!
+                cartItem.Quantity -= quantity;
+                cartItem.Purchase = cartItem.Quantity * itemToBuy.Price;
+                Core.Context.SaveChanges();
+                
+            }
+
+            // Обновляем дату изменения корзины
+            userCart.ChangeDate = DateTime.Now;
+            Core.Context.SaveChanges();
+
+            Console.WriteLine("Товар успешно приобретен, корзина обновлена.");
+        }
+
+        // верны ли сохранения выше?
 
         static void OrderAllItemsInCart(User user)
         {

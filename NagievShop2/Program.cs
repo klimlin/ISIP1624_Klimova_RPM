@@ -18,9 +18,10 @@ namespace NagievShop2
         static List<PickUpPoint> pickUpPoints = Core.Context.PickUpPoint.ToList();
         static List<User> users = Core.Context.User.ToList();
 
-
+        // правильно ли сохраняю данные? можно ли как-то улучшить? сохраняею в 3 строки
         // пароль только цифры (как поменять формат, если меняю формат в БД?) вылетали ошибки
         // формат даты - сохраняет только дату саму, без времени
+        // например, если забыла создать везде primary key или внесла другие изменения в БД, как их синхронизировать с Visual studio
 
 
         static void Main(string[] args)

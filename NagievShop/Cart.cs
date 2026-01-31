@@ -24,8 +24,8 @@ namespace NagievShop
         public int UserID { get; set; }
         public System.DateTime ChangeDate { get; set; }
     
-        public virtual User User { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CartItem> CartItem { get; set; }
+        public virtual User User { get; set; }
     }
 }

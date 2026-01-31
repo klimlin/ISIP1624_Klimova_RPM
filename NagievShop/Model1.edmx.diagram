@@ -10,16 +10,16 @@
         <EntityTypeShape EntityType="NagievShopModel.Order" Width="1.5" PointX="3" PointY="1.625" IsExpanded="true" />
         <EntityTypeShape EntityType="NagievShopModel.PickUpPoint" Width="1.5" PointX="0.75" PointY="2.25" IsExpanded="true" />
         <EntityTypeShape EntityType="NagievShopModel.sysdiagrams" Width="1.5" PointX="5.75" PointY="8.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="NagievShopModel.User" Width="1.5" PointX="0.75" PointY="5" IsExpanded="true" />
         <EntityTypeShape EntityType="NagievShopModel.CartItem" Width="1.5" PointX="5.25" PointY="4.75" IsExpanded="true" />
         <EntityTypeShape EntityType="NagievShopModel.ItemOrder" Width="1.5" PointX="5.25" PointY="0.75" IsExpanded="true" />
-        <AssociationConnector Association="NagievShopModel.FK_Cart_User" ManuallyRouted="false" />
         <AssociationConnector Association="NagievShopModel.FK_CartItem_Cart" ManuallyRouted="false" />
         <AssociationConnector Association="NagievShopModel.FK_CartItem_Item" ManuallyRouted="false" />
         <AssociationConnector Association="NagievShopModel.FK_ItemOrder_Item" ManuallyRouted="false" />
         <AssociationConnector Association="NagievShopModel.FK_ItemOrder_Order" ManuallyRouted="false" />
         <AssociationConnector Association="NagievShopModel.FK_Order_PickUpPoint" ManuallyRouted="false" />
-        <AssociationConnector Association="NagievShopModel.FK_Order_User" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="NagievShopModel.User" Width="1.5" PointX="0.75" PointY="5.375" />
+        <AssociationConnector Association="NagievShopModel.FK_Cart_User" />
+        <AssociationConnector Association="NagievShopModel.FK_Order_User" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

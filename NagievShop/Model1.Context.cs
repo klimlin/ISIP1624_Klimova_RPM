@@ -30,8 +30,8 @@ namespace NagievShop
         public virtual DbSet<Order> Order { get; set; }
         public virtual DbSet<PickUpPoint> PickUpPoint { get; set; }
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
-        public virtual DbSet<User> User { get; set; }
         public virtual DbSet<CartItem> CartItem { get; set; }
         public virtual DbSet<ItemOrder> ItemOrder { get; set; }
+        public virtual DbSet<User> User { get; set; }
     }
 }

@@ -18,6 +18,8 @@ namespace NagievShop2
         static List<PickUpPoint> pickUpPoints = Core.Context.PickUpPoint.ToList();
         static List<User> users = Core.Context.User.ToList();
 
+
+        // приводить логин к нижнему регистру
         // правильно ли сохраняю данные? можно ли как-то улучшить? сохраняею в 3 строки
         // пароль только цифры (как поменять формат, если меняю формат в БД?) вылетали ошибки
         // формат даты - сохраняет только дату саму, без времени
@@ -592,23 +594,15 @@ namespace NagievShop2
             Console.WriteLine("Введите пароль:");
             string password = Console.ReadLine();
 
-            int passw;
-            bool result = int.TryParse(password, out passw);
-
             if (string.IsNullOrWhiteSpace(password))
             {
                 Console.WriteLine("Пароль не может быть пустым.");
                 return null;
             }
 
-            if (!result)
-            {
-                Console.WriteLine("Пароль МОЖЕТ состоять только из цифр!");
-                return null;
-            }
 
 
-            var user = users.Find(u => u.Name == login && u.Password == passw);
+            var user = users.Find(u => u.Name == login && u.Password == password);
             if (user != null)
             {
                 Console.WriteLine("Успешный вход.");
@@ -639,11 +633,9 @@ namespace NagievShop2
                 return;
             }
 
-            Console.WriteLine("Введите пароль(только цифры): ");
+            Console.WriteLine("Введите пароль: ");
             string password = Console.ReadLine();
 
-            int passw;
-            bool result = int.TryParse(password, out passw);
 
             if (string.IsNullOrWhiteSpace(password))
             {
@@ -651,11 +643,6 @@ namespace NagievShop2
                 return;
             }
 
-            if (!result)
-            {
-                Console.WriteLine("Пароль МОЖЕТ состоять только из цифр!");
-                return;
-            }
 
             Console.WriteLine("Подтвердите пароль: ");
             string confirmPassword = Console.ReadLine();
@@ -675,7 +662,7 @@ namespace NagievShop2
             User newUser = new User
             {
                 Name = login,
-                Password = passw
+                Password = password
             };
 
             users.Add(newUser); // обновляем коллекцию

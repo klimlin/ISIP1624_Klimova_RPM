@@ -50,6 +50,12 @@ namespace ISIP1624_Klimova_RPM.Classes
             return _damage;
         }
 
+        public override void GetDamage(int damage)
+        {
+            damage -= _defencing;
+            _hp -= damage;
+        }
+
     }
 
 }

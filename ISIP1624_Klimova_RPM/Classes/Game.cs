@@ -75,13 +75,14 @@ namespace ISIP1624_Klimova_RPM.Classes
 
             if (numberMonsters > 0)
             {
-                int vvv = randoming.GetRandomInteger012();
+                int vvv = randoming.GetRandomInteger0123();
 
                 switch (vvv)
                 {
                     case 0: themonster = new Goblin(); break;
                     case 1: themonster = new Magician(); break;
                     case 2: themonster = new Skeleton(); break;
+                    case 3: themonster = new Slug(); break;
 
                 }
                 numberMonsters--;

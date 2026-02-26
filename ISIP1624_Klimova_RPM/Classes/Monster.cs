@@ -16,12 +16,7 @@ namespace ISIP1624_Klimova_RPM.Classes
 
         public bool IsDead() => _hp <= 0; // return лямда выражение
 
-        public void GetDamage(int damage)
-        {
-            damage -= _defencing;
-            _hp -= damage;
-        }
-
+        public abstract void GetDamage(int damage);
         public void printInfo()
         {
             Console.ForegroundColor = ConsoleColor.Red;

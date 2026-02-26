@@ -42,6 +42,12 @@ namespace ISIP1624_Klimova_RPM.Classes
             return _damage;
         }
 
+        public override void GetDamage(int damage)
+        {
+            damage -= _defencing;
+            _hp -= damage;
+        }
+
         public override bool freezingSpell()
         {
             return randoming.ChanceTwentyPercent();
